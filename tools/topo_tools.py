@@ -182,6 +182,14 @@ def deepest_sill(DS, region, end_points):
         if j<nj-1: stack.add( (j+1,i,deepest_sill_on_path,sill_j,sill_i) )
     return M[Jb,Ib], Mj[Jb,Ib] + Js, Mi[Jb,Ib] + Is
 
+def divide_interval(start, end, sub_intervals):
+    interval_width = (end - start) / sub_intervals
+    midpoints = []
+    for i in range(sub_intervals):
+        midpoint = start + interval_width * (i + 0.5)
+        midpoints.append((round(midpoint, 1), round(interval_width, 1)))
+    return midpoints
+
 def map_region(region, vmin, vmax, GEBCO, OM4, OM5, title,
                gebco_contours=[0,500], cmap=cmocean.cm.deep, text_depths=True,
                sill_check=None):
