@@ -122,6 +122,35 @@ class OM5_data:
             Js,Is = get_indices(self.lonq, self.latq, region.west(), region.south())
             Je,Ie = get_indices(self.lonq, self.latq, region.east(), region.north())
             self.depth[Js:Je,Is:Ie] = self.depth_unmodded[Js:Je,Is:Ie]
+    def list_edits(self):
+        diffs = np.where(self.depth != self.depth_unmodded)
+        edits = [(j, i, self.depth[j, i]) for j, i in zip(*diffs)]
+        return edits
+    def write_nc(self, fname="edits.nc"):
+        edit_list = self.list_edits()
+        for edit in edit_list:
+            print(f"New Depth at jEdit={edit[0]} iEdit={edit[1]} set to {edit[2]}")
+        nj, ni = self.depth.shape
+        with netCDF4.Dataset(fname, 'w', format='NETCDF4') as dataset:
+            dataset.createDimension('nEdits', len(edit_list))
+            ni_var = dataset.createVariable('ni', 'i4')
+            nj_var = dataset.createVariable('nj', 'i4')
+            ni_var.long_name = 'The size of the i-dimension of the dataset these edits apply to'
+            nj_var.long_name = 'The size of the j-dimension of the dataset these edits apply to'
+            ni_var.assignValue(ni)
+            nj_var.assignValue(nj)
+            iEdit = dataset.createVariable('iEdit', 'i4', ('nEdits',))
+            jEdit = dataset.createVariable('jEdit', 'i4', ('nEdits',))
+            zEdit = dataset.createVariable('zEdit', 'f4', ('nEdits',))
+            iEdit.long_name = 'i-index of edited data'
+            jEdit.long_name = 'j-index of edited data'
+            zEdit.long_name = 'New value of data'
+            zEdit.units = 'meters'
+            for i, (j, i_, z) in enumerate(edit_list):
+                iEdit[i] = i_
+                jEdit[i] = j
+                zEdit[i] = z
+        print(f"NetCDF file '{fname}' written successfully.")
 
 def deepest_sill(DS, region, end_points):
     """Find deepest path between (lonA,latA,lonB,latB)"""
