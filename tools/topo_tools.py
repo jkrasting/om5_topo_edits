@@ -111,10 +111,10 @@ class OM5_data:
         self.lath = y[1::2,1::2]
         self.depth = netCDF4.Dataset(depth_file).variables['depth'][:]
         self.depth_unmodded = 1.*self.depth # Unedited
-        if ((netCDF4.Dataset(depth_file).variables['x'][:]-self.lonh)**2).max()>0:
-            print('OM5 longitudes are inconsistent!')
-        if ((netCDF4.Dataset(depth_file).variables['y'][:]-self.lath)**2).max()>0:
-            print('OM5 latitudes are inconsistent!')
+        # if ((netCDF4.Dataset(depth_file).variables['x'][:]-self.lonh)**2).max()>0:
+        #     print('OM5 longitudes are inconsistent!')
+        # if ((netCDF4.Dataset(depth_file).variables['y'][:]-self.lath)**2).max()>0:
+        #     print('OM5 latitudes are inconsistent!')
     def reset(self, region=None):
         if region is None:
             self.depth[:,:] = self.depth_unmodded[:,:]
